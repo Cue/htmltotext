@@ -101,9 +101,7 @@ HtmlParser::HtmlParser()
 void
 HtmlParser::decode_entities(string &s)
 {
-    // We need a const_iterator version of s.end() - otherwise the
-    // find() and find_if() templates don't work...
-    // string::const_iterator amp = s.begin(), s_end = s.end();
+    /* Decodes entities in place, in s */
 
     typedef std::string::iterator char_iter;
     typedef std::iterator_traits<char_iter>::value_type char_type;
@@ -179,8 +177,7 @@ HtmlParser::decode_entities(string &s)
             }
             else
             {
-                char seq[4]; // = {'h','i','i','i'};
-                //size_t len = 4;
+                char seq[4];
                 unsigned len = Xapian::Unicode::nonascii_to_utf8(val, seq);
                 std::copy(seq, seq + len, writer);
                 writer += len;
