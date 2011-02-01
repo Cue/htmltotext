@@ -24,9 +24,7 @@
 
 #include <xapian.h>
 
-#include <iostream>
 #include <algorithm>
-#include <iterator>
 using std::find;
 using std::find_if;
 #include <stdio.h>
