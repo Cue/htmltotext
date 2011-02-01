@@ -1,0 +1,14 @@
+
+
+To install:
+
+python setup.py install
+
+To test:
+
+python eggsetup.py test
+
+To use:
+
+>>> import htmltotext
+>>> page = htmltotext.extract('some HTML')

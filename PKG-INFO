@@ -1,0 +1,37 @@
+Metadata-Version: 1.0
+Name: htmltotext
+Version: 0.7.3
+Summary: Extract text and some metainfo from HTML, coping with malformed pages as well as possible.
+Home-page: http://code.google.com/p/flaxcode/wiki/HtmlToText
+Author: Richard Boulton
+Author-email: richard@lemurconsulting.com
+License: GPL
+Download-URL: http://flaxcode.googlecode.com/files/htmltotext-0.7.3.tar.gz
+Description: 
+        The htmltotext module
+        =====================
+        
+        This package was written for a search engine, to allow it to extract the
+        textual content and metadata from HTML pages.  It tries to cope with
+        invalid markup and incorrectly specified character sets, and strips out
+        HTML tags (splitting words at tags appropriately).  It also discards the
+        contents of script tags and style tags.
+        
+        As well as text from the body of the page, it extracts the page title,
+        and the content of meta description and keyword tags.  It also parses
+        meta robots tags to determine whether the page should be indexed.
+        
+        The HTML parser used by this module was extracted from the Xapian search
+        engine library (and specifically, from the omindex indexing utility in
+        that library).
+        
+        
+Platform: Any
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: GNU General Public License (GPL)
+Classifier: Programming Language :: C++
+Classifier: Topic :: Internet :: WWW/HTTP :: Indexing/Search
+Classifier: Operating System :: MacOS
+Classifier: Operating System :: Microsoft
+Classifier: Operating System :: POSIX

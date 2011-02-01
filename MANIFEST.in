@@ -1,0 +1,9 @@
+include MANIFEST.in
+include README
+include ChangeLog
+include setup.py
+include eggsetup.py
+include configutils/*.h
+include src/*.h
+include src/xapian/*.h
+include test/__init__.py
