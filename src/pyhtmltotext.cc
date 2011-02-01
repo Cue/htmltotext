@@ -19,6 +19,7 @@
 
 #include <config.h>
 #include <Python.h>
+#include <stdio.h>
 #include "structmember.h"
 #include "myhtmlparse.h"
 
@@ -594,6 +595,7 @@ extract(PyObject *self, PyObject *args)
 	    throw;
 	}
 	Py_DECREF(utf8);
+	
     } else {
 	const char * buffer = NULL;
 	int buffer_length = 0;
@@ -648,6 +650,7 @@ extract(PyObject *self, PyObject *args)
     if (result->links == NULL) goto fail;
     {
 	std::vector<HtmlLink*>::const_iterator i;
+	std::map<std::string, PyObject*> para_map;
 	Py_ssize_t pos = 0;
 	for (i = parser.links.begin(); i != parser.links.end(); ++i, ++pos)
 	{
@@ -664,10 +667,18 @@ extract(PyObject *self, PyObject *args)
 					  "UTF-8", "replace");
 	    if (link->text == NULL) goto fail;
 
-	    link->para = PyUnicode_Decode((*i)->para.data(),
-					  (*i)->para.size(),
-					  "UTF-8", "replace");
-	    if (link->para == NULL) goto fail;
+	    
+	    std::map<std::string, PyObject*>::iterator para_element = para_map.find((*i)->para);
+	    if (para_element == para_map.end()) {
+		link->para = PyUnicode_Decode((*i)->para.data(),
+			  		      (*i)->para.size(),
+					      "UTF-8", "replace");
+		if (link->para == NULL) goto fail;
+		para_map[(*i)->para] = link->para;
+	    } else {
+		link->para = para_element->second;
+		Py_XINCREF(link->para);
+	    }
 
 	    link->start_pos = PyInt_FromLong((*i)->start_pos);
 	    if (link->start_pos == NULL) goto fail;
