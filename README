@@ -1,4 +1,13 @@
+htmltotext
+==========
 
+This project is forked from
+
+http://code.google.com/p/flaxcode/wiki/HtmlToText
+
+and fixes several performance bugs when dealing with large documents.
+
+----------
 
 To install:
 
