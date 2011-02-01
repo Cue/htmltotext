@@ -154,6 +154,12 @@ class TestHtmlToText(unittest.TestCase):
         self.assertEqual([t.name for t in parsed.links[1].parent_tags], ['body', 'a'])
         self.assertEqual([t.name for t in parsed.links[2].parent_tags], ['body', 'a'])
 
+    def test_entity_decode(self):
+        """Tests decoding of entities"""
+        html = '<body>This &nbsp; &nbsp; has some extra spaces. and has &#x0022;quotes&#34;</body>'
+        parsed = htmltotext.extract(html)
+        self.assertEqual(u'This \xa0 \xa0 has some extra spaces. and has "quotes"', parsed.content)
+
 def suite():
     return unittest.makeSuite(TestHtmlToText)
 

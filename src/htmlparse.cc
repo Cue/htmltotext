@@ -24,7 +24,9 @@
 
 #include <xapian.h>
 
+#include <iostream>
 #include <algorithm>
+#include <iterator>
 using std::find;
 using std::find_if;
 #include <stdio.h>
@@ -35,7 +37,8 @@ using std::find_if;
 #include "htmlparse.h"
 #include "utf8convert.h"
 
-map<string, unsigned int> HtmlParser::named_ents;
+typedef map<string, unsigned int> NamedEntityMap;
+NamedEntityMap HtmlParser::named_ents;
 
 inline static bool
 p_notdigit(char c)
@@ -100,49 +103,103 @@ HtmlParser::decode_entities(string &s)
 {
     // We need a const_iterator version of s.end() - otherwise the
     // find() and find_if() templates don't work...
-    string::const_iterator amp = s.begin(), s_end = s.end();
-    while ((amp = find(amp, s_end, '&')) != s_end) {
-    unsigned int val = 0;
-    string::const_iterator end, p = amp + 1;
-    if (p != s_end && *p == '#') {
-        p++;
-        if (p != s_end && (*p == 'x' || *p == 'X')) {
-        // hex
-        p++;
-        end = find_if(p, s_end, p_notxdigit);
-        sscanf(s.substr(p - s.begin(), end - p).c_str(), "%x", &val);
-        } else {
-        // number
-        end = find_if(p, s_end, p_notdigit);
-        val = atoi(s.substr(p - s.begin(), end - p).c_str());
+    // string::const_iterator amp = s.begin(), s_end = s.end();
+
+    typedef std::string::iterator char_iter;
+    typedef std::iterator_traits<char_iter>::value_type char_type;
+
+    char_iter begin = std::find(s.begin(), s.end(), '&');
+    char_iter entity_end = s.end();
+    char_iter writer = begin;
+
+    while (begin != s.end())
+    {
+        unsigned int val = 0;
+
+        if (begin == s.end())
+            break;
+
+        char_iter entity(begin);
+        std::advance(entity, 1);
+
+        if (entity == s.end())
+            break;
+
+        // It's a number'd entity
+        if (*entity == '#')
+        {
+            std::advance(entity, 1);
+
+            if (entity == s.end())
+                break;
+
+            // Hex
+            if (*entity == 'x' || *entity == 'X')
+            {
+                std::advance(entity, 1); // skip the x
+                // Optimization: Swapping in a null byte for sscanf and putting it back
+                entity_end = std::find_if(entity, s.end(), p_notxdigit);
+                char_type backup = *entity_end;
+                *entity_end = '\0';
+
+                // Super ugly cast
+                sscanf(&*(entity), "%x", &val);
+                *entity_end = backup;
+            }
+            // Decimal
+            else
+            {
+                // Optimization: Swapping in a null byte for sscanf and putting it back
+                entity_end = std::find_if(entity, s.end(), p_notdigit);
+                char_type backup = *entity_end;
+                *entity_end = '\0';
+
+                // Super ugly cast
+                val = atoi(&*(entity));
+                *entity_end = backup;
+            }
         }
-    } else {
-        end = find_if(p, s_end, p_notalnum);
-        string code = s.substr(p - s.begin(), end - p);
-        map<string, unsigned int>::const_iterator i;
-        i = named_ents.find(code);
-        if (i != named_ents.end()) val = i->second;
-    }
-    if (end < s_end && *end == ';') end++;
-    if (val) {
-        string::size_type amp_pos = amp - s.begin();
-        if (val < 0x80) {
-        s.replace(amp_pos, end - amp, 1u, char(val));
-        } else {
-        // Convert unicode value val to UTF-8.
-        char seq[4];
-        unsigned len = Xapian::Unicode::nonascii_to_utf8(val, seq);
-        s.replace(amp_pos, end - amp, seq, len);
+        // It's a named entity
+        else
+        {
+            entity_end = std::find_if(entity, s.end(), p_notalnum);
+            // Doh, gotta copy to lookup in named_ents
+            const std::string name(entity, entity_end);
+            NamedEntityMap::const_iterator iter = named_ents.find(name);
+
+            if (iter != named_ents.end())
+                val = iter->second;
         }
-        s_end = s.end();
-        // We've modified the string, so the iterators are no longer
-        // valid...
-        amp = s.begin() + amp_pos + 1;
-    } else {
-        amp = end;
+
+        if (val)
+        {
+            if (val < 0x80)
+            {
+                *writer++ = (char)val;
+            }
+            else
+            {
+                char seq[4]; // = {'h','i','i','i'};
+                //size_t len = 4;
+                unsigned len = Xapian::Unicode::nonascii_to_utf8(val, seq);
+                std::copy(seq, seq + len, writer);
+                writer += len;
+            }
+        }
+
+        std::advance(entity_end, 1);
+
+        if (entity_end == s.end())
+            break;
+
+        begin = std::find(entity_end, s.end(), '&');
+        std::copy(entity_end, begin, writer);
+        writer += std::distance(entity_end, begin);
     }
-    }
+
+    s.erase(writer, s.end());
 }
+
 
 void
 HtmlParser::parse_html(const string &body)
