@@ -182,10 +182,11 @@ HtmlParser::decode_entities(string &s)
             }
         }
 
-        std::advance(entity_end, 1);
 
-        if (entity_end == s.end())
+        if (entity_end == s.end() || entity_end + 1 == s.end())
             break;
+
+        std::advance(entity_end, 1);
 
         begin = std::find(entity_end, s.end(), '&');
         std::copy(entity_end, begin, writer);
