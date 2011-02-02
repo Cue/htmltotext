@@ -60,7 +60,7 @@ that library).
 """
 
 setup(name = "htmltotext",
-      version = "0.7.3",
+      version = "0.7.3b",
       author = "Richard Boulton",
       author_email = "richard@lemurconsulting.com",
       maintainer = "Richard Boulton",

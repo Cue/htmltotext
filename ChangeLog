@@ -1,3 +1,6 @@
+Version 0.7.3b
+  * Fix memory usage for entity decoding [6aa3037b] <kevinc at greplin>
+
 Mon Dec 15 15:31:25 GMT 2008  Richard Boulton <richard@lemurconsulting.com>
 
 	* src/htmlparse.cc: Add string.h, as suggested in issue #203.
