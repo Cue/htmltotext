@@ -19,8 +19,6 @@
 
 """
 
-import os
-import sys
 from configutils import Extension, setup, config, build_ext, using_setuptools
 
 # List of source files
@@ -81,6 +79,8 @@ setup(name = "htmltotext",
       ],
       license = 'GPL',
       platforms = 'Any',
+
+      packages = ['configutils'],
 
       cmdclass = {
           'config': config,
