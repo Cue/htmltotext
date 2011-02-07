@@ -112,7 +112,8 @@ startswith(const string & s, const string & p)
 void
 MyHtmlParser::new_para()
 {
-    pending_space = true;
+    if (!dump.empty())
+        dump += '\n';
     std::string paratext = dump.substr(parastart);
     std::vector<HtmlLink*>::const_iterator i;
     for (i = paralinks.begin(); i != paralinks.end(); ++i) {
