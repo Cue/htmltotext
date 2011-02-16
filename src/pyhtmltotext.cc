@@ -74,7 +74,7 @@ PyHtmlTag_str(PyHtmlTag * link)
     PyObject * format = NULL;
     PyObject * empty = NULL;
     const char * formatstr = "PyHtmlTag(name=%r, cls=%r, id=%r)";
-    
+
     format = PyUnicode_Decode(formatstr, strlen(formatstr), "utf-8", NULL);
     if (format == NULL) goto fail;
 
@@ -242,7 +242,7 @@ PyHtmlLink_str(PyHtmlLink * link)
     PyObject * format = NULL;
     PyObject * empty = NULL;
     const char * formatstr = "PyHtmlLink(target=%r, text=%r, para=%r, start_pos=%s)";
-    
+
     format = PyUnicode_Decode(formatstr, strlen(formatstr), "utf-8", NULL);
     if (format == NULL) goto fail;
 
@@ -435,7 +435,7 @@ ParsedPage_str(ParsedPage * parsedpage)
     PyObject * format = NULL;
     PyObject * empty = NULL;
     const char * formatstr = "ParsedPage(title=%r, content=%r, description=%r, keywords=%r)";
-    
+
     format = PyUnicode_Decode(formatstr, strlen(formatstr), "utf-8", NULL);
     if (format == NULL) goto fail;
 
@@ -595,7 +595,7 @@ extract(PyObject *self, PyObject *args)
 	    throw;
 	}
 	Py_DECREF(utf8);
-	
+
     } else {
 	const char * buffer = NULL;
 	int buffer_length = 0;
@@ -651,6 +651,7 @@ extract(PyObject *self, PyObject *args)
     {
 	std::vector<HtmlLink*>::const_iterator i;
 	std::map<std::string, PyObject*> para_map;
+	std::map<std::string, PyObject*> name_map;
 	Py_ssize_t pos = 0;
 	for (i = parser.links.begin(); i != parser.links.end(); ++i, ++pos)
 	{
@@ -667,7 +668,7 @@ extract(PyObject *self, PyObject *args)
 					  "UTF-8", "replace");
 	    if (link->text == NULL) goto fail;
 
-	    
+
 	    std::map<std::string, PyObject*>::iterator para_element = para_map.find((*i)->para);
 	    if (para_element == para_map.end()) {
 		link->para = PyUnicode_Decode((*i)->para.data(),
@@ -683,7 +684,7 @@ extract(PyObject *self, PyObject *args)
 	    link->start_pos = PyInt_FromLong((*i)->start_pos);
 	    if (link->start_pos == NULL) goto fail;
 
-	    {
+	    /*{
 		Py_XDECREF(link->parent_tags);
 		link->parent_tags = PyList_New((*i)->parent_tags.size());
 		std::vector<HtmlTag>::const_iterator j;
@@ -745,7 +746,7 @@ extract(PyObject *self, PyObject *args)
 		    PyList_SET_ITEM(link->child_tags, tagpos, (PyObject *)tag);
 		    tag = NULL;
 		}
-	    }
+	    }*/
 
 	    PyList_SET_ITEM(result->links, pos, (PyObject *)link);
 	    link = NULL;
