@@ -31,7 +31,7 @@ class TestHtmlToText(unittest.TestCase):
         html = '<html><body><p>Hello  World</p></body></html>'
         self.assertEqual(htmltotext.extract(html).title, u'')
         self.assertEqual(htmltotext.extract(html).description, u'')
-        self.assertEqual(htmltotext.extract(html).content, u'Hello World')
+        self.assertEqual(htmltotext.extract(html).content, u'Hello World\n\n')
 
     def test_default_charset(self):
         """Test a conversion supplying a string, which should use the default
@@ -93,28 +93,28 @@ class TestHtmlToText(unittest.TestCase):
         """
         html = '<title>Here it <p/>is</title><body><foo class="1" id=top>body <a href="bar">link content</a><b/><a href="/foo2">2</p><a class="foo" href="http://bar.com/foo3">3</a> end body</foo><a href="test"><i>mo<em>re</em></i><b>test</a></body>'
         parsed = htmltotext.extract(html)
-        self.assertEqual(parsed.title, u'Here it is')
+        self.assertEqual(parsed.title, u'Here it\n is')
         self.assertEqual(parsed.description, u'')
         self.assertEqual(parsed.keywords, u'')
         self.assertEqual(parsed.indexing_allowed, True)
-        self.assertEqual(parsed.content, 'body link content2 3 end bodymoretest')
+        self.assertEqual(parsed.content, 'body link content2\n3 end bodymoretest\n')
         self.assertEqual(len(parsed.links), 4)
 
         self.assertEqual(parsed.links[0].target, u'bar')
         self.assertEqual(parsed.links[0].text, u'link content')
-        self.assertEqual(parsed.links[0].para, u'body link content2')
+        self.assertEqual(parsed.links[0].para, u'body link content2\n')
         self.assertEqual(parsed.links[0].start_pos, 4)
         self.assertEqual(parsed.links[1].target, u'/foo2')
-        self.assertEqual(parsed.links[1].text, u'2')
-        self.assertEqual(parsed.links[1].para, u'body link content2')
+        self.assertEqual(parsed.links[1].text, u'2\n')
+        self.assertEqual(parsed.links[1].para, u'body link content2\n')
         self.assertEqual(parsed.links[1].start_pos, 17)
         self.assertEqual(parsed.links[2].target, u'http://bar.com/foo3')
         self.assertEqual(parsed.links[2].text, u'3')
-        self.assertEqual(parsed.links[2].para, u'3 end bodymoretest')
-        self.assertEqual(parsed.links[2].start_pos, 18)
+        self.assertEqual(parsed.links[2].para, u'3 end bodymoretest\n')
+        self.assertEqual(parsed.links[2].start_pos, 19)
         self.assertEqual(parsed.links[3].target, u'test')
         self.assertEqual(parsed.links[3].text, u'moretest')
-        self.assertEqual(parsed.links[3].para, u'3 end bodymoretest')
+        self.assertEqual(parsed.links[3].para, u'3 end bodymoretest\n')
         self.assertEqual(parsed.links[3].start_pos, 29)
 
         self.assertEqual(len(parsed.links[0].parent_tags), 3)
@@ -142,7 +142,7 @@ class TestHtmlToText(unittest.TestCase):
         self.assertEqual(parsed.links[3].child_tags[1].name, 'em')
         self.assertEqual(parsed.links[3].child_tags[2].name, 'b')
 
-        self.assertEqual(parsed.parastarts, [0, 18, 37])
+        self.assertEqual(parsed.parastarts, [0, 19, 38])
 
     def test_link2(self):
         """Test parsing some links interspersed with tags which don't close.
@@ -158,7 +158,7 @@ class TestHtmlToText(unittest.TestCase):
         """Tests decoding of entities"""
         html = '<body>This &nbsp; &nbsp; has some extra spaces. and has &#x0022;quotes&#34;</body>'
         parsed = htmltotext.extract(html)
-        self.assertEqual(u'This \xa0 \xa0 has some extra spaces. and has "quotes"', parsed.content)
+        self.assertEqual(u'This \xa0 \xa0 has some extra spaces. and has "quotes"\n', parsed.content)
 
 def suite():
     return unittest.makeSuite(TestHtmlToText)
