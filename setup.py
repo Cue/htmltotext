@@ -19,7 +19,10 @@
 
 """
 
-from configutils import Extension, setup, config, build_ext, using_setuptools
+try:
+  from setuptools import Extension, setup, config, build_ext, using_setuptools
+except ImportError:
+  from configutils import Extension, setup, config, build_ext, using_setuptools
 
 # List of source files
 htmltotext_sources = [
